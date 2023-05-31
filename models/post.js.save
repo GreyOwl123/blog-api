@@ -1,0 +1,23 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const PostSchema = new Schema({
+   title: { type: String, required: true },
+   author: { type: Schema.Types.ObjectId, ref: "Author" },
+   content: { type: String, required: true },
+   timestamp: { createdAt: 'created_at',
+               updatedAt: 'updated_at' },
+   status: {
+    type: String,
+    required: true,
+    enum: ["Publish", "Save"],
+  },
+});
+
+// Virtual for post's URL.
+PostSchema.virtual("url").get(function () {
+   return `/api/post/${this.id}`;
+});
+
+module.exports = mongoose.model("Post, PostSchema);
