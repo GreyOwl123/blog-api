@@ -43,11 +43,7 @@ exports.comment_detail = (req, res, next) => {
     );
 };
 
-exports.comment_create_get = (req, res, next) => {
-    res.status(200).json("comment_create", { title: "Comment"});
-};
-
-exports.comment_create_post = [
+exports.comment_create = [
     body("content", "Content is required")
        .trim()
        .isLength({ min: 1 })
@@ -76,34 +72,7 @@ exports.comment_create_post = [
   }
 ]
 
-exports.comment_update_get = (req, res, next) => {
-    async.parallel(
-        {
-          comment(callback) {
-            Comment.findById(req.params.id)
-              .exec(callback);
-          },
-        },
-        (err, results) => {
-          if (err) {
-            return next(err);
-          }
-          if (results.comment == null) {
-            // No results.
-            const err = new Error("Comment not found");
-            err.status = 404;
-            return next(err);
-          }
-          // Success.
-          res.json("comment_form", {
-            title: "Edit Reply",
-            comment: results.comment,
-          });
-        }
-    );    
-};
-
-exports.comment_update_post = [
+exports.comment_update = [
     body("content", "Content is required")
        .trim()
        .isLength({ min: 1 })
@@ -118,7 +87,6 @@ exports.comment_update_post = [
    });
  
      if (!errors.isEmpty()) {
-       // There are errors. Render form again with sanitized values/errors messages.
  
       (err,results) => {
         if (err) {
@@ -133,7 +101,6 @@ exports.comment_update_post = [
      return;
     }
  
-   // Data from form is valid. Update the record
    Comment.findByIdAndUpdate(req.params.id, comment, {}, (err, thecomment)  => {
      if (err) {
        return next(err);
@@ -146,31 +113,7 @@ exports.comment_update_post = [
  
 ];
 
-exports.comment_delete_get = (req, res, next) => {
-    async.parallel(
-        {
-          comment(callback) {
-            Comment.findById(req.params.id).exec(callback);
-          },
-        },
-        (err, results) => {
-          if (err) {
-            return next(err);
-          }
-          if (results.comment == null) {
-            // No results.
-            res.redirect("/api/post/postid");
-          }
-          // Successful, so.json.
-          res.json("comment_delete", {
-            title: "Delete comment",
-            comment: results.comment,
-          });
-        }
-    );
-};
-
-exports.comment_delete_post = (req, res, next) => {
+exports.comment_delete = (req, res, next) => {
     async.parallel(
         {
           comment(callback) {
@@ -199,5 +142,3 @@ exports.comment_delete_post = (req, res, next) => {
         }
       );    
 };
-
-

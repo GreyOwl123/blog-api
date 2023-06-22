@@ -11,7 +11,6 @@ exports.post_list = function(req, res, next) {
       if (err) {
         return next(err);
       }
-      //Successful, so status(200).json
       res.json("post_list", {
         title: "Post List",
         post_list: list_posts,
@@ -48,11 +47,7 @@ exports.post_detail = (req, res, next) => {
     );
 };
 
-exports.post_create_get = (req, res, next) => {
-    res.status(200).json("post_create", { title: "Create Post" });
-};
-
-exports.post_create_post = [
+exports.post_create = [
     body("title", "Article name is required")
        .trim()
        .isLength({ min: 1 })
@@ -63,7 +58,6 @@ exports.post_create_post = [
        .escape(),
     body("status").escape(),
 
-  // Process request after validation and sanitization.
   (req, res, next) => {
     const errors = validationResult(req);
      
@@ -80,6 +74,10 @@ exports.post_create_post = [
         content: req.body.content,
         status: req.body.status,
     });
+   // After Post draft and probably before editing, put a conditional to either 
+   // save to database or publish right here, save is already implemented, that
+   // remains publish....??
+
     post.save((err) => {
         if (err) {
             return next(err);
@@ -90,38 +88,7 @@ exports.post_create_post = [
   }
 ]
 
-exports.post_update_get = (req, res, next) => {
-    async.parallel(
-        {
-          post(callback) {
-            Post.findById(req.params.id)
-              .exec(callback);
-          },
-          comments(callback) {
-            Comment.find(callback);
-          },
-        },
-        (err, results) => {
-          if (err) {
-            return next(err);
-          }
-          if (results.post == null) {
-            // No results.
-            const err = new Error("Article not found");
-            err.status = 404;
-            return next(err);
-          }
-          // Success.
-          res.json("post_form", {
-            title: "Update Article",
-            post: results.post,
-            comment: results.comments,
-          });
-        }
-    );    
-};
-
-exports.post_update_post = [
+exports.post_update = [
     body("title", "Article name is required")
        .trim()
        .isLength({ min: 1 })
@@ -137,11 +104,10 @@ exports.post_update_post = [
     const post = new Post({
      title: req.body.title,
      content: req.body.content,
-     _id: req.params.id, //This is required, or a new ID would be assigned to the author.
+     _id: req.params.id,
    });
  
      if (!errors.isEmpty()) {
-       // There are errors. Render form again with sanitized values/errors messages.
     
       (err,results) => {
         if (err) {
@@ -167,36 +133,9 @@ exports.post_update_post = [
    });
  },
  
-];
+];        
 
-exports.post_delete_get = (req, res, next) => {
-    async.parallel(
-        {
-          post(callback) {
-            Post.findById(req.params.id).exec(callback);
-          },
-          comments(callback) {
-            Comment.findById(req.params.id).exec(callback);
-          }
-        },
-        (err, results) => {
-          if (err) {
-            return next(err);
-          }
-          if (results.post == null) {
-            res.redirect("/api/posts");
-          }
-          // Successful, so status(200).json.
-          res.json("post_delete", {
-            title: "Delete Article",
-            post: results.post,
-            comment: results.comments
-          });
-        }
-    );
-};
-
-exports.post_delete_post = (req, res, next) => {
+exports.post_delete = (req, res, next) => {
     async.parallel(
         {
           post(callback) {
@@ -210,7 +149,6 @@ exports.post_delete_post = (req, res, next) => {
           if (err) {
             return next(err);
           }
-          // Success
           if (results.posts_comments.length > 0) {
             res.json("post_delete", {
               title: "Post delete",
@@ -229,6 +167,3 @@ exports.post_delete_post = (req, res, next) => {
       );    
 };
 
-exports.post_published = function(req, res) {};
-
-exports.post_saved = function(req, res) {};
