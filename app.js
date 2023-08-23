@@ -2,24 +2,24 @@ if (process.env.NODE_ENV !== "production") {
    require('dotenv').config();
 }
 
-import bcryptjs from 'bcryptjs';
-import createError from 'http-errors';
+const bcryptjs  = require('bcryptjs');
+const createError  = require('http-errors');
 const express = require('express');
-import path from 'path';
-import cookieParser from 'cookie-parser';
-import logger  from 'morgan';
-import async from "async";
-import passport from "passport-jwt";
-import session from 'express-session';
-import LocalStrategy from "passport-local";
-import Author from './models/author';
+const path  = require('path');
+const cookieParser  = require('cookie-parser');
+const logger   = require('morgan');
+const async  = require("async");
+const passport  = require("passport-jwt");
+const session  = require('express-session');
+const LocalStrategy  = require("passport-local");
+const Author  = require('./models/author');
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var apiRouter = require('./routes/api');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const apiRouter = require('./routes/api');
 
-var app = express();
+const app = express();
 
 // Mongoose connection
 const mongoose = require("mongoose");
@@ -73,11 +73,11 @@ passport.deserializeUser(async function(id, done) {
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
-app.use(passport.initalize());
+app.use(passport.initialize());
 app.use(passport.authenticate('session'));
 
 app.use(function(req, res, next) {

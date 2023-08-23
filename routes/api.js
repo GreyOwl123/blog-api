@@ -8,7 +8,7 @@ const author_controller = require('../controllers/authorController');
 
 // Author routes.
 
-router.get('/', author_controller.index);
+//router.get('/', author_controller.index);
 
 router.post('/author/signup', author_controller.author_signup);
 
@@ -18,7 +18,7 @@ router.post('/author/logout', author_controller.author_logout);
 
 router.get('/author/:id', author_controller.author_detail);
 
-router.get('/authors', author_controller.author_list);
+// router.get('/authors', author_controller.author_list);
 
 router.post('/author/:id/delete', author_controller.author_delete);
 
@@ -32,7 +32,7 @@ router.post('/user/:id/delete', user_controller.user_delete);
 
 router.get('/user/:id', user_controller.user_detail);
 
-router.get('/users', user_controller.user_list);
+// router.get('/users', user_controller.user_list);
 
 router.post('/user/signup', user_controller.user_signup);
 

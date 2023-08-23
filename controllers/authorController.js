@@ -7,6 +7,11 @@ const jwtSecret = process.env.JSON_WEB_TOKEN;
 const bcryptjs = require("bcryptjs");
 const passport = require("passport")
 
+/*
+ GET THE INFORMATION IN JSON FORMAT FROM THE MONGODB DATABASE AND RETURN IT IN 
+ JSON FORM USING RES.JSON WHCH WILL BE CONSUMED ON THE FRONT END 
+*/
+
 exports.author_signup = [
     body("first_name", "Author name is required")
        .trim()
@@ -28,15 +33,7 @@ exports.author_signup = [
   (req, res, next) => { 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.render("author_signup", {
-            title: "Author Signup",
-            author: req.body,
-            errors: errors.array(),
-          });
-        return;
-      } 
-
-bcryptjs.hash(req.body.password, 10, async (err, hashedPassword) => {
+   bcryptjs.hash(req.body.password, 10, async (err, hashedPassword) => {
      const author = new Author({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
@@ -57,7 +54,7 @@ bcryptjs.hash(req.body.password, 10, async (err, hashedPassword) => {
        timeLimit: timeLimit * 1000,
     });
   })
-  await author.save()
+   await author.save()
       .then(() =>{
         res.status(200).json({
           message: "Signup Successful",
@@ -73,6 +70,7 @@ bcryptjs.hash(req.body.password, 10, async (err, hashedPassword) => {
     res.redirect('/author/login')
     })
   }
+ }
 ]
 
 exports.author_login = 
@@ -103,8 +101,7 @@ exports.author_detail = (req, res, next) => {
             err.status = 404;
             return next(err);
           }
-          res.json("author_detail", {
-            title: "Account detail",
+          res.status(200).json({
             author: results.author,
             post: results.post,
           });
@@ -127,8 +124,7 @@ exports.author_delete = (req, res, next) => {
             return next(err);
           }
           if (results.authors_posts.length > 0) {
-            res.json("author_delete", {
-              title: "Delete Author",
+            res.json({
               author: results.author,
               author_posts: results.authors_posts,
             });
@@ -164,7 +160,7 @@ exports.author_update = [
 
   (req, res, next) => {
     const errors = validationResult(req); 
-
+    if (!errors.isEmpty()) {
     const author = new Author({
      first_name: req.body.first_name,
      family_name: req.body.family_name,
@@ -172,28 +168,7 @@ exports.author_update = [
      date_of_death: req.body.date_of_death,
      _id: req.params.id, 
    });
- 
-     if (!errors.isEmpty()) {
-     async.parallel(
-       {
-         books(callback) {
-           Book.find(callback);
-         },
-       },
-      (err,results) => {
-        if (err) {
-         return next(err);
-        }
-       res.json("author_form", {
-         title: "Update Author",
-         books: results.books,
-         author,
-         errors: errors.array(),
-       });
-      }
-     );
-     return;
-    }
+  }
    Author.findByIdAndUpdate(req.params.id, author, {}, (err, theauthor)  => {
      if (err) {
        return next(err);

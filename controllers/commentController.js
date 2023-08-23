@@ -11,7 +11,7 @@ exports.comment_list = function(req, res, next) {
         return next(err);
       }
       //Successful
-      res.json("comment_list", {
+      res.json({
         title: "Post List",
         post_list: list_posts,
       });
@@ -34,7 +34,7 @@ exports.comment_detail = (req, res, next) => {
             err.status = 404;
             return next(err);
           }
-          res.status(200).json("author_detail", {
+          res.status(200).json({
             title: "Account detail",
             author: results.author,
             post: results.post,
